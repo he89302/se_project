@@ -70,11 +70,11 @@
         "relationship": [{
             "coding": [{
                 "system": "http://terminology.hl7.org/CodeSystem/v2-0131",
-                "code": "N"
+                "code": "父子"
             }]
         }],
         "name": {
-            "family": "du March矇",
+            "family": "郭",
             "_family": {
                 "extension": [{
                     "url": "http://hl7.org/fhir/StructureDefinition/humanname-own-prefix",
@@ -82,28 +82,28 @@
                 }]
             },
             "given": [
-                "B矇n矇dicte"
+                "台銘"
             ]
         },
         "telecom": [{
             "system": "phone",
-            "value": "+33 (237) 998327"
+            "value": "098765432"
         }],
         "address": {
             "use": "home",
             "type": "both",
+            "text": "大安區忠孝東路三段1號",
             "line": [
                 "534 Erewhon St"
             ],
-            "city": "PleasantVille",
-            "district": "Rainbow",
-            "state": "Vic",
-            "postalCode": "3999",
+            "city": "Taipei",
+            "district": "大安區",
+            "postalCode": "1",
             "period": {
                 "start": "1974-12-25"
             }
         },
-        "gender": "female",
+        "gender": "male",
         "period": {
             "start": "2012"
         }

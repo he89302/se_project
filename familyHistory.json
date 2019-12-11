@@ -1,0 +1,22 @@
+{
+    "resourceType": "Condition",
+    "id": "250080",
+    "meta": {
+        "versionId": "1",
+        "lastUpdated": "2019-12-10T14:59:38.254+00:00"
+    },
+    "text": {
+        "status": "generated",
+        "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Family history of cancer of colon</div>"
+    },
+    "code": {
+        "coding": [{
+            "system": "http://snomed.info/sct",
+            "code": "312824007",
+            "display": "Family history of cancer of colon"
+        }]
+    },
+    "subject": {
+        "reference": "Patient/99409"
+    }
+}

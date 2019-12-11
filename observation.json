@@ -1,0 +1,74 @@
+{
+    "resourceType": "Observation",
+    "id": "249761",
+    "meta": {
+        "versionId": "1",
+        "lastUpdated": "2019-12-10T13:32:34.759+00:00",
+        "source": "#b8b4a0c7b0c5d231"
+    },
+    "status": "final",
+    "code": {
+        "coding": [{
+            "system": "http ://loinc.org",
+            "code": "Weight"
+        }]
+    },
+    "subject": {
+        "reference": "Patient/99409"
+    },
+    "effectiveInstant": "2019-09-30T22:10:10.962+00:00",
+    "issued": "2019-09-30T22:10:10.961+00:00",
+    "valueQuantity": {
+        "value": 82.5,
+        "unit": "kg"
+    }
+}
+
+{
+    "resourceType": "Observation",
+    "id": "249765",
+    "meta": {
+        "versionId": "1",
+        "lastUpdated": "2019-12-10T13:47:42.406+00:00",
+        "source": "#b8b4a0c7b0c5d231"
+    },
+    "status": "final",
+    "code": {
+        "coding": [{
+            "system": "http ://loinc.org",
+            "code": "BloodGroup"
+        }]
+    },
+    "subject": {
+        "reference": "Patient/99409"
+    },
+    "effectiveInstant": "2019-09-30T22:10:10.962+00:00",
+    "issued": "2019-09-30T22:10:10.961+00:00",
+    "valueString": "AB"
+}
+
+{
+    "resourceType": "Observation",
+    "id": "249763",
+    "meta": {
+        "versionId": "1",
+        "lastUpdated": "2019-12-10T13:40:43.418+00:00",
+        "source": "#2a0dC6AT5L2wOl8h"
+    },
+    "status": "final",
+    "code": {
+        "coding": [{
+            "system": "http ://loinc.org",
+            "code": "Height"
+        }]
+    },
+    "subject": {
+        "reference": "Patient/99409"
+    },
+    "effectiveInstant": "2019-09-30T22:10:10.962+00:00",
+    "issued": "2019-09-30T22:10:10.961+00:00",
+    "valueQuantity": {
+        "value": 190,
+        "unit": "cm"
+    }
+}
