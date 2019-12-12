@@ -21,8 +21,8 @@ export function callPostProcedureAPI(obj) {
 
 function MakePatientModal(props) {
     const [state, setState] = useState({
-        nameFamily: '',
-        nameGiven: props.name.given,
+        nameFamily: props.nameFamily,
+        nameGiven: props.nameGiven,
         gender: props.gender,
         patientId: props.patientId,
         height: props.height,
@@ -35,47 +35,90 @@ function MakePatientModal(props) {
         telecom: props.telecom,
         contactsFamily: props.contactsFamily,
         contactsGiven: props.contactsGiven,
-        contactsRelation: props.contacts.relation,
+        contactsRelation: props.contactsRelation,
         contactsTel: props.contactsTel,
         note: '',
     });
-    var moment = require('moment');
+    // var moment = require('moment');
 
-    function buildProceduredata(display, outcome) {
-        let obj = {
-            resource: {
-                resourceType: 'Procedure',
-                code: {
-                    coding: [{
-                        system: "http://snomed.info/sct",
-                        code: "230056204",
-                        display: display
-                    }],
-                    text: "230056004"
-                },
-                subject: { reference: "Patient/99409" },
-                performedDateTime: moment().format('YYYY-MM-DD'),
-                outcome: { text: outcome }
-            }
-        };
-        return obj;
-    }
+    // function buildProceduredata(display, outcome) {
+    //     let obj = {
+    //         resource: {
+    //             resourceType: 'Procedure',
+    //             code: {
+    //                 coding: [{
+    //                     system: "http://snomed.info/sct",
+    //                     code: "230056204",
+    //                     display: display
+    //                 }],
+    //                 text: "230056004"
+    //             },
+    //             subject: { reference: "Patient/99409" },
+    //             performedDateTime: moment().format('YYYY-MM-DD'),
+    //             outcome: { text: outcome }
+    //         }
+    //     };
+    //     return obj;
+    // }
 
     function handleSubmit(event) {
-        console.log('addddd', state)
+        let nameFamily = state.nameFamily;
+        let nameGiven = state.nameGiven;
+        let gender = state.gender;
+        let birthDate = state.birthDate;
+        let telecomeValue = state.telcome;
+        let address = [];
+        let coding = state.coding;
+        let contactsFamily = state.contactsFamily;
+        let contactsGiven = state.contactsGiven;
+        let contactsRelation = state.contactsRelation;
+        let contactsTel = state.contactsTel;
+        let height = state.height;
+        let weight = state.weight;
+        let bloodGroup = state.bloodGroup;
+        let familyHistory = state.familyHistory;
+        let name = [];
+        let telecome = [];
+        telecome.push({
+            "system": "phone",
+            "value": telecomeValue,
+            "use": "home",
+        })
+        address.push({
+            "use": "home",
+            "type": "both",
+            "text": state.address,
+            "city": state.city,
+            "district": "大安區",
+            "postalCode": "1",
+        })
+        name.push({
+            'family': nameFamily,
+            'given': nameGiven 
+        })
+        let contact = [];
+        contact.push({
+            'name': {
+                'family':state.contactsFamily,
+                'given':state.given
+            },
+            'telecom':[{'value':state.contactsTel}],
+            'relationship':[{'coding':[{'code':state.contactsRelation}]}]
+        })
+        let data = { name, gender, birthDate, telecome, address, contact}
+        props.updateName(data);
         props.setModalShow(false);
-
     }
 
     function handleNameFamilyChange(event) {
         const value = event.target.value;
-        const nameFamily = props.name.family;
-        if(value !== ''){
+        const nameFamily = props.nameFamily;
+        if (value !== '') {
             setState({
                 ...state,
                 nameFamily: value,
             });
-        } else if(value === ''){
+        } else if (value === '') {
             setState({
                 ...state,
                 nameFamily: nameFamily,
@@ -85,17 +128,10 @@ function MakePatientModal(props) {
 
     function handleNameGivenChange(event) {
         const value = event.target.value;
-        if(value !== ''){
         setState({
             ...state,
             nameGiven: value,
         });
-        } else {
-            setState({
-                ...state,
-                nameFamily: props.name.given,
-            });
-        }
     }
 
     function handleGenderChange(event) {
@@ -228,10 +264,10 @@ function MakePatientModal(props) {
                         <Form.Row>
                             <Form.Label>姓名 :</Form.Label>
                             <Col controlId="formNameFamily">
-                                <Form.Control type="formNameFamily" placeholder="姓" defaultValue={props.name.family} onChange={handleNameFamilyChange} />
+                                <Form.Control type="formNameFamily" placeholder="姓" defaultValue={props.nameFamily} onChange={handleNameFamilyChange} />
                             </Col>
                             <Col>
-                                <Form.Control controlId="formNameGiven" type="formCodeDisplay" placeholder="名" defaultValue={props.name.given} onChange={handleNameGivenChange} />
+                                <Form.Control controlId="formNameGiven" type="formCodeDisplay" placeholder="名" defaultValue={props.nameGiven} onChange={handleNameGivenChange} />
                             </Col>
                         </Form.Row>
                         <Form.Text className="text-muted" >
@@ -305,9 +341,7 @@ function MakePatientModal(props) {
                     </Form.Group>
                     <Form.Group controlId="formOutcome">
                         <Form.Label>監護人關係</Form.Label>
-                        {props.contacts.map((item, index) => {
-                            return (<Form.Control type="formCodeDisplay" placeholder="監護人關係" defaultValue={props.contactsRelation} onChange={handleContactsRelationChange} />);
-                        })}
+                            <Form.Control type="formCodeDisplay" placeholder="監護人關係" defaultValue={props.contactsRelation} onChange={handleContactsRelationChange} />
                     </Form.Group>
                     <Form.Group controlId="formOutcome">
                         <Form.Label>監護人手機</Form.Label>

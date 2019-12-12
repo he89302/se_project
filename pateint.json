@@ -2,8 +2,8 @@
     "resourceType": "Patient",
     "id": "99409",
     "meta": {
-        "versionId": "2",
-        "lastUpdated": "2019-11-25T12:22:57.913+00:00",
+        "versionId": "6",
+        "lastUpdated": "2019-12-12T09:11:35.295+00:00",
         "source": "#3QcLnbkaZT6WVMEL"
     },
     "text": {
@@ -11,12 +11,6 @@
         "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"> <div class=\"hapiHeaderText\">Caleb <b>CUSHING </b> </div> <table class=\"hapiPropertyTable\"> <tbody> <tr> <td>Identifier</td> <td>0782287d-78bc-4aec-8dd1-af467e4b685a</td> </tr> </tbody> </table> </div>"
     },
     "identifier": [{
-        "type": {
-            "coding": [{
-                "system": "http://hl7.org/fhir/v2/0203",
-                "code": "MR"
-            }]
-        },
         "value": "I200339123"
     }],
     "name": [{
@@ -26,38 +20,19 @@
         ]
     }],
     "telecom": [{
-            "use": "home"
-        },
-        {
-            "system": "phone",
-            "value": "(03) 5555 6473",
-            "use": "work",
-            "rank": 1
-        },
-        {
-            "system": "phone",
-            "value": "0912345678",
-            "use": "mobile",
-            "rank": 2
-        },
-        {
-            "system": "phone",
-            "value": "(03) 5555 8834",
-            "use": "old",
-            "period": {
-                "end": "2014"
-            }
+        "system": "phone",
+        "value": "(886-2) 2771-2171",
+        "use": "home",
+        "period": {
+            "end": "2014"
         }
-    ],
+    }],
     "gender": "male",
     "birthDate": "1977-04-01",
     "address": [{
         "use": "home",
         "type": "both",
         "text": "大安區忠孝東路三段1號",
-        "line": [
-            "534 Erewhon St"
-        ],
         "city": "Taipei",
         "district": "大安區",
         "postalCode": "1",
@@ -65,7 +40,9 @@
             "start": "1974-12-25"
         }
     }],
-    "photo": [{ "url": "https://ppt.cc/fG5Gtx@.png" }],
+    "photo": [{
+        "url": "https://ppt.cc/fG5Gtx@.png"
+    }],
     "contact": [{
         "relationship": [{
             "coding": [{

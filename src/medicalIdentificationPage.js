@@ -21,6 +21,7 @@ function EditUserInforModelButton(props) {
                 setModalShow={setModalShow}
                 {...props}
                 currentTime={props.currentTime}
+                updateName={props.updateName}
             />
         </ButtonToolbar>
     );
@@ -30,18 +31,18 @@ class MedicalIdentificationPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            id: "",                 //FHIR自己產生的ID
+            id: '',                 //FHIR自己產生的ID
             patientId: 'I200339123',//身分證
             contacts: [],
-            birthDate: "",
+            birthDate: '',
             age: 0,
-            name: {},
-            gender: "",
+            nameFamily:'',
+            nameGiven:'',
+            gender: '',
             telecom: [],
-            imageUrl: "",
+            imageUrl: '',
             address: {},
             coding: [],
-            procedure: [],
             observation: [],
             contactsFamily:'',
             contactsGiven:'',
@@ -52,6 +53,7 @@ class MedicalIdentificationPage extends Component {
             bloodGroup: '',
             familyHistory: [],
         }
+        this.updateName = this.updateName.bind(this);
     }
 
     patientInfo() {
@@ -59,15 +61,9 @@ class MedicalIdentificationPage extends Component {
             let telecomArray = this.prepare(data.telecom);
             let contactsArray = this.prepare(data.contact);
             this.setState({
-                id: data.id,
-                birthDate: data.birthDate,
-                name: data.name[0],
-                gender: data.gender,
-                address: data.address[0],
                 imageUrl: data.photo[0].url,
-                telecom: telecomArray,
-                contacts: contactsArray,
-            });
+            })
+            this.updateName(data, telecomArray, contactsArray);
             CallAllergyIntoleranceAPI(this.state.id).then(data => {
                 let codingArray = this.prepare(data);
                 this.setState({
@@ -88,6 +84,18 @@ class MedicalIdentificationPage extends Component {
             });
             const age = this.calculatedAge();
             this.updatedContactsInfo(age);
+        });
+    }
+
+    updateName(data, telecomArray, contactsArray) {
+        console.log('data', data)
+        this.setState({
+            id:data.id,
+            nameFamily: data.name[0].family,
+            nameGiven: data.name[0].given,
+            birthDate: data.birthDate,
+            gender: data.gender,
+            address: data.address[0],
         });
     }
 
@@ -185,7 +193,7 @@ class MedicalIdentificationPage extends Component {
                             <Dropdown >
                                 <Dropdown.Toggle className="toggle-button" variant="secondary">
                                     <font color="white">
-                                        {this.state.name.family} {this.state.name.given}
+                                        {this.state.nameFamily} {this.state.nameGiven}
                                     </font>&nbsp;
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu className="dropdown-menu-right">
@@ -200,7 +208,7 @@ class MedicalIdentificationPage extends Component {
                         </Form>
                     </Navbar><br /><br /><br /><br />
                         <div className="button-position" style={{ display: 'flex' }}>
-                            <EditUserInforModelButton {...this.state} />
+                            <EditUserInforModelButton {...this.state} updateName={this.updateName}/>
                             <table align="center" border="1px"><tbody>
                                 <tr>
                                     <td>
@@ -208,7 +216,7 @@ class MedicalIdentificationPage extends Component {
                                     </td>
                                     <tr>
                                         <td>姓名 : </td>
-                                        <td>{this.state.name.family} {this.state.name.given}</td>
+                                        <td>{this.state.nameFamily} {this.state.nameGiven}</td>
                                     </tr>
                                     <tr>
                                         <td>性別 : </td>
@@ -257,16 +265,12 @@ class MedicalIdentificationPage extends Component {
                                         <td>{this.state.telecom.map((item) => {
                                             if (item.value !== undefined)
                                                 return (<div>{item.value}<br /></div>);
-                                            else return null;
+                                            else return '';
                                         })}</td>
                                     </tr>
                                     <tr>
                                         <td>監護人姓名 : </td>
-                                        <td>{this.state.contacts.map((item) => {
-                                            if (item !== undefined)
-                                                return (<div>{item.name.family} {item.name.given}</div>);
-                                            else return null;
-                                        })}
+                                        <td>{this.state.contactsFamily + this.state.contactsGiven}
                                         </td>
                                     </tr>
                                     <tr>
