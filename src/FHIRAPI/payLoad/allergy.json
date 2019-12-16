@@ -1,0 +1,34 @@
+{
+    "resourceType": "AllergyIntolerance",
+    "id": "99422",
+    "meta": {
+        "versionId": "4",
+        "lastUpdated": "2019-12-16T07:29:24.315+00:00"
+    },
+    "type": "allergy",
+    "category": [
+        "medication"
+    ],
+    "code": {
+        "coding": [{
+            "system": "http://snomed.info/sct",
+            "code": "7980",
+            "display": "Penicillin"
+        }]
+    },
+    "patient": {
+        "reference": "Patient/99409"
+    },
+    "onsetDateTime": "2010-11-25",
+    "reaction": [{
+        "manifestation": [{
+            "coding": [{
+                "system": "http://snomed.info/sct",
+                "code": "247472004",
+                "display": "Hives"
+            }]
+        }],
+        "onset": "2004-10-19",
+        "severity": "moderate"
+    }]
+}

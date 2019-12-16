@@ -1,31 +1,11 @@
-import React, { Component, useState } from 'react';
-import { Navbar, Nav, Form, Dropdown, ButtonToolbar, Button, Container } from 'react-bootstrap';
+import React, { Component } from 'react';
+import { Navbar, Nav, Form, Dropdown, Container } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import CallPatientAPI from './FHIRAPI/callPatientAPI';
-import MakePatientModal from './makePatientModal'
+import EditUserInforModelButton from './editUserInforModelButton';
 import CallAllergyIntoleranceAPI from './FHIRAPI/callAllergyIntoleranceAPI';
 import CallObservationAPI from './FHIRAPI/callObservationAPI';
 import CallConditionAPI from './FHIRAPI/callConditionAPI.js'
-
-function EditUserInforModelButton(props) {
-    const [modalShow, setModalShow] = useState(false);
-
-    return (
-        <ButtonToolbar>
-            <Button variant="primary" onClick={() => setModalShow(true)}>
-                Edit
-        </Button>
-            <MakePatientModal
-                show={modalShow}
-                onHide={() => setModalShow(false)}
-                setModalShow={setModalShow}
-                {...props}
-                currentTime={props.currentTime}
-                updateName={props.updateName}
-            />
-        </ButtonToolbar>
-    );
-}
 
 class MedicalIdentificationPage extends Component {
     constructor(props) {
@@ -42,33 +22,34 @@ class MedicalIdentificationPage extends Component {
             telecom: [],
             imageUrl: '',
             address: {},
-            coding: [],
+            city: '',
+            addressText: '',
+            allergy: [],
+            allergyId: '',
             observation: [],
             contactsFamily:'',
             contactsGiven:'',
             contactsRelation: [],
             contactsTel: '',
+            observationWeightId: '',
+            observationHeightId: '',
+            observationBloodGroupId: '',
             height: 0,
             weight: 0,
             bloodGroup: '',
+            familyHistoryId: '',
             familyHistory: [],
         }
-        this.updateName = this.updateName.bind(this);
     }
 
     patientInfo() {
-        CallPatientAPI(this.state.patientId).then(data => {
-            let telecomArray = this.prepare(data.telecom);
-            let contactsArray = this.prepare(data.contact);
+            CallPatientAPI(this.state.patientId).then(data => {
             this.setState({
                 imageUrl: data.photo[0].url,
             })
-            this.updateName(data, telecomArray, contactsArray);
-            CallAllergyIntoleranceAPI(this.state.id).then(data => {
-                let codingArray = this.prepare(data);
-                this.setState({
-                    coding: codingArray
-                });
+            this.updateName(data);
+            CallAllergyIntoleranceAPI(this.state.id).then(data => { 
+                this.updateAllergyInfo(data);
             });
             CallObservationAPI(this.state.id).then(data => {
                 let entryArray = this.prepare(data);
@@ -79,37 +60,68 @@ class MedicalIdentificationPage extends Component {
             CallConditionAPI(this.state.id).then(data => {
                 let entryArray = this.prepare(data);
                 entryArray.forEach((item) => {
-                    this.updateFamilyHistory(item.resource.code);
-                });
+                    this.updateFamilyHistory(item.resource);
+                })
             });
-            const age = this.calculatedAge();
-            this.updatedContactsInfo(age);
         });
     }
 
-    updateName(data, telecomArray, contactsArray) {
-        console.log('data', data)
+    updateName = (data) => {
+        let codeArray = [];
+        let contactsFamily = "";
+        let contactsGiven = "";
+        let contactsTel = "";
+        data.contact.forEach((item) => {
+            contactsFamily = item.name.family;
+            contactsGiven = item.name.given;
+            let relationshipArray = this.prepare(item.relationship);
+            let telecomArray = this.prepare(item.telecom);
+            codeArray.push(relationshipArray[0].coding[0].code);
+            contactsTel = telecomArray[0].value;
+        });
         this.setState({
             id:data.id,
             nameFamily: data.name[0].family,
             nameGiven: data.name[0].given,
             birthDate: data.birthDate,
             gender: data.gender,
+            telecom: data.telecom[0].value,
             address: data.address[0],
+            city: data.address[0].city,
+            addressText: data.address[0].text,
+            contactsFamily: contactsFamily,
+            contactsGiven: contactsGiven,
+            contactsRelation: codeArray,
+            contactsTel: contactsTel,
         });
+        let birthDate = this.state.birthDate;
+        this.calculatedAge(birthDate);
     }
 
-    updateFamilyHistory(code) {
+    updateAllergyInfo = (data) => {
+        let codingArray = this.prepare(data.code.coding);
+        let tempArray = [];
+        codingArray.forEach((item) => {
+            tempArray.push(item.display)
+        })
+        this.setState({
+            allergyId: data.id,
+            allergy: tempArray,
+        })
+    }
+
+    updateFamilyHistory = (data) => {
         let itemDisplayArray = [];
-        code.coding.forEach((item) => {
+        data.code.coding.forEach((item) => {
             itemDisplayArray.push(item.display)
         })
         this.setState({
+            familyHistoryId: data.id,
             familyHistory: itemDisplayArray
         })
     }
 
-    updateObservationInfo(type, observationResource) {
+    updateObservationInfo = (type, observationResource) => {
         if (type === 'Weight') {
             this.setWeight(observationResource);
         } else if (type === 'Height') {
@@ -121,49 +133,38 @@ class MedicalIdentificationPage extends Component {
 
     setWeight(observationResource) {
         this.setState({
+            observationWeightId: observationResource.id,
             weight: observationResource.valueQuantity.value
         })
     }
 
     setHeight(observationResource) {
         this.setState({
+            observationHeightId: observationResource.id,
             height: observationResource.valueQuantity.value
         })
     }
 
     setBloodGroup(observationResource) {
         this.setState({
+            observationBloodGroupId: observationResource.id,
             bloodGroup: observationResource.valueString
         })
     }
 
-    calculatedAge = () => {
-        var moment = require('moment');
-        let birthDate = this.state.birthDate;
-        return moment().diff(parseInt(birthDate, 10) + 1, 'years');
-    }
-
-    updatedContactsInfo(age) {
-        let codeArray = [];
-        let contactsFamily = "";
-        let contactsGiven = "";
-        let contactsTel = "";
-        let contacts = this.prepare(this.state.contacts);
-        contacts.forEach((item) => {
-            contactsFamily = item.name.family;
-            contactsGiven = item.name.given;
-            let relationshipArray = this.prepare(item.relationship);
-            let telecomArray = this.prepare(item.telecom);
-            codeArray.push(relationshipArray[0].coding[0].code);
-            contactsTel = telecomArray[0].value;
-        });
-        this.setState({
-            contactsFamily: contactsFamily,
-            contactsGiven: contactsGiven,
-            age: age,
-            contactsRelation: codeArray,
-            contactsTel: contactsTel,
-        });
+    calculatedAge = (birthDate) => {
+        let moment = require('moment');
+        let ages = this.state.age;
+        let age =  moment().diff(parseInt(birthDate) + 1, 'years');
+        if(ages !== age) {
+            this.setState({
+            age:age
+            });
+        } else {
+            this.setState({
+                age:2019-2000
+                });
+        }
     }
 
     componentWillMount() {
@@ -208,7 +209,12 @@ class MedicalIdentificationPage extends Component {
                         </Form>
                     </Navbar><br /><br /><br /><br />
                         <div className="button-position" style={{ display: 'flex' }}>
-                            <EditUserInforModelButton {...this.state} updateName={this.updateName}/>
+                            <EditUserInforModelButton {...this.state} 
+                                                      updateName={this.updateName}
+                                                      calculatedAge={this.calculatedAge}
+                                                      updateObservationInfo={this.updateObservationInfo}
+                                                      updateAllergyInfo={this.updateAllergyInfo}
+                                                      updateFamilyHistory={this.updateFamilyHistory}/>
                             <table align="center" border="1px"><tbody>
                                 <tr>
                                     <td>
@@ -252,21 +258,15 @@ class MedicalIdentificationPage extends Component {
                                     </tr>
                                     <tr>
                                         <td>過敏藥物 : </td>
-                                        <td>{this.state.coding.map((item) => {
-                                            return (<tr>{item.display} </tr>);
-                                        })}</td>
+                                        <td>{this.state.allergy}</td>
                                     </tr>
                                     <tr>
                                         <td>住址 : </td>
-                                        <td>{this.state.address.city} {this.state.address.text}</td>
+                                        <td>{this.state.city} {this.state.addressText}</td>
                                     </tr>
                                     <tr>
                                         <td>電話 : </td>
-                                        <td>{this.state.telecom.map((item) => {
-                                            if (item.value !== undefined)
-                                                return (<div>{item.value}<br /></div>);
-                                            else return '';
-                                        })}</td>
+                                        <td>{this.state.telecom}</td>
                                     </tr>
                                     <tr>
                                         <td>監護人姓名 : </td>

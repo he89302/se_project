@@ -37,7 +37,7 @@ function MakeProcedureModal(props) {
                 }],
                 text: "230056004"
             },
-            subject: { reference: "Patient/99409" },
+            subject: { reference: "Patient/".concat(props.id) },
             performedDateTime: moment().format('YYYY-MM-DD'),
             outcome: { text: outcome }
         }};

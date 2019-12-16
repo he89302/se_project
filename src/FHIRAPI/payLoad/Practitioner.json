@@ -1,0 +1,31 @@
+{
+    "resourceType": "Practitioner",
+    "id": "100123",
+    "meta": {
+        "versionId": "2",
+        "lastUpdated": "2019-12-13T07:19:16.832+00:00",
+        "source": "#iDevc0ANC8FjcF1r"
+    },
+    "identifier": [{
+        "use": "official",
+        "system": "https://radboud.nl/identifiers/PractitionerIdentifier",
+        "value": "A200339321"
+    }],
+    "name": [{
+        "family": "小",
+        "given": [
+            "馮"
+        ],
+        "prefix": [
+            "DR"
+        ]
+    }],
+    "gender": "unknown",
+    "communication": [{
+        "coding": [{
+            "system": "urn:ietf:bcp:47",
+            "code": "CH",
+            "display": "Chinese"
+        }]
+    }]
+}

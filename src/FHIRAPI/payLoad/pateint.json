@@ -52,12 +52,6 @@
         }],
         "name": {
             "family": "郭",
-            "_family": {
-                "extension": [{
-                    "url": "http://hl7.org/fhir/StructureDefinition/humanname-own-prefix",
-                    "valueString": "VV"
-                }]
-            },
             "given": [
                 "台銘"
             ]
@@ -71,7 +65,7 @@
             "type": "both",
             "text": "大安區忠孝東路三段1號",
             "line": [
-                "534 Erewhon St"
+                "大安區忠孝東路三段1號"
             ],
             "city": "Taipei",
             "district": "大安區",

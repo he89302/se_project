@@ -1,13 +1,69 @@
 import React, { useState } from 'react';
 import { Button, Modal, Form, Col } from 'react-bootstrap'
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
-export function callPostProcedureAPI(obj) {
-    fetch('http://hapi.fhir.org/baseR4/Procedure', {
+export function callPostObservationAPI(obj) {
+    fetch('http://hapi.fhir.org/baseR4/Observation', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         }, body: JSON.stringify(
-            obj.resource
+            obj
+        )
+    }).then((response) => {
+        return response.json();
+
+    }).then((jsonData) => {
+        console.log(jsonData);
+    }).catch((err) => {
+        console.log('錯誤:', err);
+    })
+}
+
+export function callPutPatientAPI(obj) {
+    fetch('http://hapi.fhir.org/baseR4/Patient/'.concat(obj.id), {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        }, body: JSON.stringify(
+            obj
+        )
+    }).then((response) => {
+        return response.json();
+
+    }).then((jsonData) => {
+        console.log(jsonData);
+    }).catch((err) => {
+        console.log('錯誤:', err);
+    })
+}
+
+export function callPutAllergyAPI(obj) {
+    fetch('http://hapi.fhir.org/baseR4/AllergyIntolerance/'.concat(obj.id), {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        }, body: JSON.stringify(
+            obj
+        )
+    }).then((response) => {
+        return response.json();
+
+    }).then((jsonData) => {
+        console.log(jsonData);
+    }).catch((err) => {
+        console.log('錯誤:', err);
+    })
+}
+
+export function callPutFamilyHistoryAPI(obj) {
+    fetch('http://hapi.fhir.org/baseR4/Condition/'.concat(obj.id), {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        }, body: JSON.stringify(
+            obj
         )
     }).then((response) => {
         return response.json();
@@ -27,10 +83,13 @@ function MakePatientModal(props) {
         patientId: props.patientId,
         height: props.height,
         weight: props.weight,
+        birthDate: props.birthDate,
+        age: 0,
         bloodGroup: props.bloodGroup,
         familyHistory: props.familyHistory,
-        allergy: props.coding,
-        city: props.address.city,
+        allergy: props.allergy,
+        city: props.city,
+        addressText: props.addressText,
         address: props.address.text,
         telecom: props.telecom,
         contactsFamily: props.contactsFamily,
@@ -39,47 +98,18 @@ function MakePatientModal(props) {
         contactsTel: props.contactsTel,
         note: '',
     });
-    // var moment = require('moment');
-
-    // function buildProceduredata(display, outcome) {
-    //     let obj = {
-    //         resource: {
-    //             resourceType: 'Procedure',
-    //             code: {
-    //                 coding: [{
-    //                     system: "http://snomed.info/sct",
-    //                     code: "230056204",
-    //                     display: display
-    //                 }],
-    //                 text: "230056004"
-    //             },
-    //             subject: { reference: "Patient/99409" },
-    //             performedDateTime: moment().format('YYYY-MM-DD'),
-    //             outcome: { text: outcome }
-    //         }
-    //     };
-    //     return obj;
-    // }
+    var moment = require('moment');
 
     function handleSubmit(event) {
         let nameFamily = state.nameFamily;
         let nameGiven = state.nameGiven;
         let gender = state.gender;
-        let birthDate = state.birthDate;
-        let telecomeValue = state.telcome;
+        let birthDate = moment(state.birthDate).format('YYYY-MM-DD')
+        let telecomeValue = state.telecom;
         let address = [];
-        let coding = state.coding;
-        let contactsFamily = state.contactsFamily;
-        let contactsGiven = state.contactsGiven;
-        let contactsRelation = state.contactsRelation;
-        let contactsTel = state.contactsTel;
-        let height = state.height;
-        let weight = state.weight;
-        let bloodGroup = state.bloodGroup;
-        let familyHistory = state.familyHistory;
         let name = [];
-        let telecome = [];
-        telecome.push({
+        let telecom = [];
+        telecom.push({
             "system": "phone",
             "value": telecomeValue,
             "use": "home",
@@ -87,44 +117,153 @@ function MakePatientModal(props) {
         address.push({
             "use": "home",
             "type": "both",
-            "text": state.address,
+            "text": state.addressText,
             "city": state.city,
             "district": "大安區",
             "postalCode": "1",
         })
         name.push({
             'family': nameFamily,
-            'given': nameGiven 
+            'given': nameGiven
         })
         let contact = [];
         contact.push({
             'name': {
-                'family':state.contactsFamily,
-                'given':state.given
+                'family': state.contactsFamily,
+                'given': state.contactsGiven
             },
-            'telecom':[{'value':state.contactsTel}],
-            'relationship':[{'coding':[{'code':state.contactsRelation}]}]
+            'telecom': [{ 'value': state.contactsTel }],
+            'relationship': [{ 'coding': [{ 'code': state.contactsRelation }] }]
         })
-        let data = { name, gender, birthDate, telecome, address, contact}
+        let data = {
+            "resourceType": "Patient",
+            "id": props.id,
+            "identifier": [{
+                "value": "I200339123"
+            }],
+            "photo": [{
+                "url": "https://ppt.cc/fG5Gtx@.png"
+            }],
+            name,
+            gender,
+            birthDate,
+            telecom,
+            address,
+            contact
+        }
         props.updateName(data);
+        props.calculatedAge(birthDate);
+        let observationWeightResource = {
+            "resourceType": "Observation",
+            "code": {
+                "coding": [{
+                    "system": "http ://loinc.org",
+                    "code": "Weight"
+                }]
+            },
+            "subject": {
+                "reference": "Patient/".concat(props.id)
+            }, 'valueQuantity': {
+                "value": state.weight,
+                "unit": "kg"
+            }
+        }
+        let observationHeightResource = {
+            "resourceType": "Observation",
+            "code": {
+                "coding": [{
+                    "system": "http ://loinc.org",
+                    "code": "Height"
+                }]
+            },
+            "subject": {
+                "reference": "Patient/".concat(props.id)
+            }, 'valueQuantity': {
+                "value": state.height,
+                "unit": "cm"
+            }
+        }
+        let observationBloodGroupResource = {
+            "resourceType": "Observation",
+            "code": {
+                "coding": [{
+                    "system": "http ://loinc.org",
+                    "code": "BloodGroup"
+                }]
+            },
+            "subject": {
+                "reference": "Patient/".concat(props.id)
+            }, "valueString": state.bloodGroup
+        }
+
+        let allergyResource = {
+            "resourceType": "AllergyIntolerance",
+            "id": props.allergyId,
+            "type": "allergy",
+            "category": [
+                "medication"
+            ],
+            "code": {
+                "coding": [{
+                    "system": "http://snomed.info/sct",
+                    "code": "7980",
+                    "display": state.allergy
+                }]
+            },
+            "patient": {
+                "reference": "Patient/".concat(props.id)
+            }
+        }
+
+        let familyHistoryResource = {
+            "resourceType": "Condition",
+            "id": props.familyHistoryId,
+            "code": {
+                "coding": [{
+                    "system": "http://snomed.info/sct",
+                    "code": "312824007",
+                    "display": state.familyHistory
+                }]
+            },
+            "subject": {
+                "reference": "Patient/".concat(props.id)
+            }
+        }
+        props.updateObservationInfo('Weight', observationWeightResource);
+        props.updateObservationInfo('Height', observationHeightResource);
+        props.updateObservationInfo('BloodGroup', observationBloodGroupResource);
+        props.updateAllergyInfo(allergyResource);
+        props.updateFamilyHistory(familyHistoryResource);
+        callPostObservationAPI(observationWeightResource);
+        callPostObservationAPI(observationHeightResource);
+        callPostObservationAPI(observationBloodGroupResource);
+        callPutPatientAPI(data);
+        callPutAllergyAPI(allergyResource);
+        callPutFamilyHistoryAPI(familyHistoryResource);
         props.setModalShow(false);
+    }
+
+    function handleCityChange(event) {
+        setState({
+            ...state,
+            city: event.target.value
+        })
     }
 
     function handleNameFamilyChange(event) {
         const value = event.target.value;
-        const nameFamily = props.nameFamily;
-        if (value !== '') {
-            setState({
-                ...state,
-                nameFamily: value,
-            });
-        } else if (value === '') {
-            setState({
-                ...state,
-                nameFamily: nameFamily,
-            });
-        }
+        setState({
+            ...state,
+            nameFamily: value,
+        });
     }
+
+    function handleBirthDayChange(date) {
+        setState({
+            ...state,
+            birthDate: date
+        });
+    };
 
     function handleNameGivenChange(event) {
         const value = event.target.value;
@@ -190,11 +329,11 @@ function MakePatientModal(props) {
         });
     }
 
-    function handleAddressChange(event) {
+    function handleAddressTextChange(event) {
         const value = event.target.value;
         setState({
             ...state,
-            address: value,
+            addressText: value,
         });
     }
 
@@ -218,7 +357,7 @@ function MakePatientModal(props) {
         const value = event.target.value;
         setState({
             ...state,
-            contactsFamily: value,
+            contactsGiven: value,
         });
     }
 
@@ -285,6 +424,15 @@ function MakePatientModal(props) {
                             身分證字號為必填
                         </Form.Text>
                     </Form.Group>
+                    <Form.Group controlId="formPatientId">
+                        <Form.Label>生日 :</Form.Label>
+                        <DatePicker
+                            showPopperArrow={false}
+                            placeholderText={props.birthDate}
+                            selected={state.birthDate}
+                            onChange={date => handleBirthDayChange(date)}
+                        />
+                    </Form.Group>
                     <Form.Group controlId="formHeight">
                         <Form.Label>身高 :</Form.Label>
                         <Form.Control type="formCodeDisplay" placeholder="身高" defaultValue={props.height} onChange={handleHeightChange} />
@@ -303,30 +451,23 @@ function MakePatientModal(props) {
                     </Form.Group>
                     <Form.Group controlId="formFamilyHistory">
                         <Form.Label>過敏藥物 :</Form.Label>
-                        {props.coding.map((item, index) => {
-                            return (<Form.Control type="formCodeDisplay" placeholder="過敏藥物" defaultValue={item.display} onChange={handleAllergyChange} />);
-                        })}
+                        <Form.Control type="formAllergyDisplay" placeholder="過敏藥物" defaultValue={props.allergy} onChange={handleAllergyChange} />
                     </Form.Group>
                     <Form.Group controlId="formFamilyHistory">
                         <Form.Row>
                             <Col>
                                 <Form.Label>地區 :</Form.Label>
-                                <Form.Control type="formCodeDisplay" placeholder="地區" defaultValue={props.address.city} onChange={handleAddressChange} />
+                                <Form.Control type="formCodeDisplay" placeholder="地區" defaultValue={props.city} onChange={handleCityChange} />
                             </Col>
                             <Col>
                                 <Form.Label>住址 :</Form.Label>
-                                <Form.Control type="formCodeDisplay" placeholder="住址" defaultValue={props.address.text} onChange={handleAddressChange} />
+                                <Form.Control type="formCodeDisplay" placeholder="住址" defaultValue={props.addressText} onChange={handleAddressTextChange} />
                             </Col>
                         </Form.Row>
                     </Form.Group>
                     <Form.Group controlId="formFamilyHistory">
                         <Form.Label>電話 :</Form.Label>
-                        {props.telecom.map((item, index) => {
-                            if (item.value !== undefined)
-                                return (<Form.Control type="formCodeDisplay" placeholder="電話" defaultValue={item.value} onChange={handleTelecomChange} />);
-                            else
-                                return null;
-                        })}
+                        <Form.Control type="formCodeDisplay" placeholder="電話" defaultValue={props.telecom} onChange={handleTelecomChange} />
                     </Form.Group>
                     <Form.Group controlId="formOutcome">
                         <Form.Label>監護人姓名</Form.Label>
@@ -341,7 +482,7 @@ function MakePatientModal(props) {
                     </Form.Group>
                     <Form.Group controlId="formOutcome">
                         <Form.Label>監護人關係</Form.Label>
-                            <Form.Control type="formCodeDisplay" placeholder="監護人關係" defaultValue={props.contactsRelation} onChange={handleContactsRelationChange} />
+                        <Form.Control type="formCodeDisplay" placeholder="監護人關係" defaultValue={props.contactsRelation} onChange={handleContactsRelationChange} />
                     </Form.Group>
                     <Form.Group controlId="formOutcome">
                         <Form.Label>監護人手機</Form.Label>

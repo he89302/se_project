@@ -22,6 +22,7 @@ function CrateNewProceedureModelButton(props) {
                 setModalShow={setModalShow}
                 data={props.procedureData}
                 currentTime={props.currentTime}
+                id={props.id}
             />
         </ButtonToolbar>
     );
@@ -75,7 +76,7 @@ class MedicalRecordPage extends Component {
                 telecom: telecomArray,
             });
             CallAllergyIntoleranceAPI(this.state.id).then(data => {
-                let codingArray = this.prepare(data);
+                let codingArray = this.prepare(data.code.coding);
                 this.setState({
                     coding: codingArray
                 });
@@ -275,7 +276,7 @@ class MedicalRecordPage extends Component {
                     </Navbar><br /><br /><br /><br />
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                         <div className="function-manager" style={{ display: 'flex', }}>
-                            <CrateNewProceedureModelButton procedureData={this.state.procedure} />
+                            <CrateNewProceedureModelButton procedureData={this.state.procedure} id={this.state.id} />
                         </div>
                         <br />
                         <div className="button-position" style={{ display: 'flex' }}>
