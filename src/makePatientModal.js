@@ -2,81 +2,14 @@ import React, { useState } from 'react';
 import { Button, Modal, Form, Col } from 'react-bootstrap'
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
-export function callPostObservationAPI(obj) {
-    fetch('http://hapi.fhir.org/baseR4/Observation', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        }, body: JSON.stringify(
-            obj
-        )
-    }).then((response) => {
-        return response.json();
-
-    }).then((jsonData) => {
-        console.log(jsonData);
-    }).catch((err) => {
-        console.log('錯誤:', err);
-    })
-}
-
-export function callPutPatientAPI(obj) {
-    fetch('http://hapi.fhir.org/baseR4/Patient/'.concat(obj.id), {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        }, body: JSON.stringify(
-            obj
-        )
-    }).then((response) => {
-        return response.json();
-
-    }).then((jsonData) => {
-        console.log(jsonData);
-    }).catch((err) => {
-        console.log('錯誤:', err);
-    })
-}
-
-export function callPutAllergyAPI(obj) {
-    fetch('http://hapi.fhir.org/baseR4/AllergyIntolerance/'.concat(obj.id), {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        }, body: JSON.stringify(
-            obj
-        )
-    }).then((response) => {
-        return response.json();
-
-    }).then((jsonData) => {
-        console.log(jsonData);
-    }).catch((err) => {
-        console.log('錯誤:', err);
-    })
-}
-
-export function callPutFamilyHistoryAPI(obj) {
-    fetch('http://hapi.fhir.org/baseR4/Condition/'.concat(obj.id), {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        }, body: JSON.stringify(
-            obj
-        )
-    }).then((response) => {
-        return response.json();
-
-    }).then((jsonData) => {
-        console.log(jsonData);
-    }).catch((err) => {
-        console.log('錯誤:', err);
-    })
-}
+import callPutObservationAPI from "./FHIRAPI/callPutObservationAPI";
+import callPutPatientAPI from "./FHIRAPI/callPutPatientAPI";
+import callPutAllergyAPI from "./FHIRAPI/callPutAllergyAPI";
+import callPutFamilyHistoryAPI from "./FHIRAPI/callPutFamilyHistoryAPI";
 
 function MakePatientModal(props) {
     const [state, setState] = useState({
+        ...props,
         nameFamily: props.nameFamily,
         nameGiven: props.nameGiven,
         gender: props.gender,
@@ -90,7 +23,6 @@ function MakePatientModal(props) {
         allergy: props.allergy,
         city: props.city,
         addressText: props.addressText,
-        address: props.address.text,
         telecom: props.telecom,
         contactsFamily: props.contactsFamily,
         contactsGiven: props.contactsGiven,
@@ -101,6 +33,7 @@ function MakePatientModal(props) {
     var moment = require('moment');
 
     function handleSubmit(event) {
+        console.log('bbbb', state.city)
         let nameFamily = state.nameFamily;
         let nameGiven = state.nameGiven;
         let gender = state.gender;
@@ -109,6 +42,7 @@ function MakePatientModal(props) {
         let address = [];
         let name = [];
         let telecom = [];
+        let contact = [];
         telecom.push({
             "system": "phone",
             "value": telecomeValue,
@@ -119,14 +53,13 @@ function MakePatientModal(props) {
             "type": "both",
             "text": state.addressText,
             "city": state.city,
-            "district": "大安區",
+            "district": "",
             "postalCode": "1",
         })
         name.push({
             'family': nameFamily,
             'given': nameGiven
         })
-        let contact = [];
         contact.push({
             'name': {
                 'family': state.contactsFamily,
@@ -139,7 +72,7 @@ function MakePatientModal(props) {
             "resourceType": "Patient",
             "id": props.id,
             "identifier": [{
-                "value": "I200339123"
+                "value": state.patientId
             }],
             "photo": [{
                 "url": "https://ppt.cc/fG5Gtx@.png"
@@ -151,10 +84,9 @@ function MakePatientModal(props) {
             address,
             contact
         }
-        props.updateName(data);
-        props.calculatedAge(birthDate);
         let observationWeightResource = {
             "resourceType": "Observation",
+            "id": props.observationWeightId,
             "code": {
                 "coding": [{
                     "system": "http ://loinc.org",
@@ -170,6 +102,7 @@ function MakePatientModal(props) {
         }
         let observationHeightResource = {
             "resourceType": "Observation",
+            "id": props.observationHeightId,
             "code": {
                 "coding": [{
                     "system": "http ://loinc.org",
@@ -185,6 +118,7 @@ function MakePatientModal(props) {
         }
         let observationBloodGroupResource = {
             "resourceType": "Observation",
+            "id": props.observationBloodGroupId,
             "code": {
                 "coding": [{
                     "system": "http ://loinc.org",
@@ -229,21 +163,24 @@ function MakePatientModal(props) {
                 "reference": "Patient/".concat(props.id)
             }
         }
+        props.updateName(data);
+        props.calculatedAge(birthDate);
         props.updateObservationInfo('Weight', observationWeightResource);
         props.updateObservationInfo('Height', observationHeightResource);
         props.updateObservationInfo('BloodGroup', observationBloodGroupResource);
         props.updateAllergyInfo(allergyResource);
         props.updateFamilyHistory(familyHistoryResource);
-        callPostObservationAPI(observationWeightResource);
-        callPostObservationAPI(observationHeightResource);
-        callPostObservationAPI(observationBloodGroupResource);
-        callPutPatientAPI(data);
-        callPutAllergyAPI(allergyResource);
-        callPutFamilyHistoryAPI(familyHistoryResource);
+        // callPutObservationAPI(observationWeightResource);
+        // callPutObservationAPI(observationHeightResource);
+        // callPutObservationAPI(observationBloodGroupResource);
+        // callPutPatientAPI(data);
+        // callPutAllergyAPI(allergyResource);
+        // callPutFamilyHistoryAPI(familyHistoryResource);
         props.setModalShow(false);
     }
 
     function handleCityChange(event) {
+        console.log('aaaa', event.target.value);
         setState({
             ...state,
             city: event.target.value
@@ -282,10 +219,9 @@ function MakePatientModal(props) {
     }
 
     function handlePatientIdChange(event) {
-        const value = event.target.value;
         setState({
             ...state,
-            patientId: value,
+            patientId: event.target.value,
         });
     }
 
@@ -402,11 +338,11 @@ function MakePatientModal(props) {
                     <Form.Group >
                         <Form.Row>
                             <Form.Label>姓名 :</Form.Label>
-                            <Col controlId="formNameFamily">
-                                <Form.Control type="formNameFamily" placeholder="姓" defaultValue={props.nameFamily} onChange={handleNameFamilyChange} />
+                            <Col>
+                                <Form.Control id="formNameFamily" placeholder="姓" defaultValue={props.nameFamily} onChange={handleNameFamilyChange} />
                             </Col>
                             <Col>
-                                <Form.Control controlId="formNameGiven" type="formCodeDisplay" placeholder="名" defaultValue={props.nameGiven} onChange={handleNameGivenChange} />
+                                <Form.Control id="formNameGiven" placeholder="名" defaultValue={props.nameGiven} onChange={handleNameGivenChange} />
                             </Col>
                         </Form.Row>
                         <Form.Text className="text-muted" >
@@ -415,82 +351,83 @@ function MakePatientModal(props) {
                     </Form.Group>
                     <Form.Group controlId="formGendar">
                         <Form.Label>性別 :</Form.Label>
-                        <Form.Control type="formCodeDisplay" placeholder="性別" defaultValue={props.gender} onChange={handleGenderChange} />
+                        <Form.Control id="formGender" placeholder="性別" defaultValue={props.gender} onChange={handleGenderChange} />
                     </Form.Group>
-                    <Form.Group controlId="formPatientId">
+                    <Form.Group>
                         <Form.Label>身分證字號 :</Form.Label>
-                        <Form.Control type="formCodeDisplay" placeholder="身分證字號" defaultValue={props.patientId} onChange={handlePatientIdChange} />
+                        <Form.Control id="formPatientId" placeholder="身分證字號" defaultValue={props.patientId} onChange={handlePatientIdChange} />
                         <Form.Text className="text-muted" >
                             身分證字號為必填
                         </Form.Text>
                     </Form.Group>
-                    <Form.Group controlId="formPatientId">
+                    <Form.Group>
                         <Form.Label>生日 :</Form.Label>
                         <DatePicker
+                            id="birthPicker"
                             showPopperArrow={false}
                             placeholderText={props.birthDate}
                             selected={state.birthDate}
                             onChange={date => handleBirthDayChange(date)}
                         />
                     </Form.Group>
-                    <Form.Group controlId="formHeight">
+                    <Form.Group>
                         <Form.Label>身高 :</Form.Label>
-                        <Form.Control type="formCodeDisplay" placeholder="身高" defaultValue={props.height} onChange={handleHeightChange} />
+                        <Form.Control id="formHeight" type="formCodeDisplay" placeholder="身高" defaultValue={props.height} onChange={handleHeightChange} />
                     </Form.Group>
-                    <Form.Group controlId="formWeight">
+                    <Form.Group>
                         <Form.Label>體重 :</Form.Label>
-                        <Form.Control type="formCodeDisplay" placeholder="體重" defaultValue={props.weight} onChange={handleWeightChange} />
+                        <Form.Control id="formWeight" placeholder="體重" defaultValue={props.weight} onChange={handleWeightChange} />
                     </Form.Group>
-                    <Form.Group controlId="formBloodGroup">
+                    <Form.Group>
                         <Form.Label>血型 :</Form.Label>
-                        <Form.Control type="formCodeDisplay" placeholder="血型" defaultValue={props.bloodGroup} onChange={handleBloodGroupChange} />
+                        <Form.Control id="formBloodGroup" placeholder="血型" defaultValue={props.bloodGroup} onChange={handleBloodGroupChange} />
                     </Form.Group>
-                    <Form.Group controlId="formFamilyHistory">
+                    <Form.Group>
                         <Form.Label>家族病史 :</Form.Label>
-                        <Form.Control type="formCodeDisplay" placeholder="家族病史" defaultValue={props.familyHistory} onChange={handleFamilyHistoryChange} />
+                        <Form.Control id="formFamilyHistory" placeholder="家族病史" defaultValue={props.familyHistory} onChange={handleFamilyHistoryChange} />
                     </Form.Group>
-                    <Form.Group controlId="formFamilyHistory">
+                    <Form.Group>
                         <Form.Label>過敏藥物 :</Form.Label>
-                        <Form.Control type="formAllergyDisplay" placeholder="過敏藥物" defaultValue={props.allergy} onChange={handleAllergyChange} />
+                        <Form.Control id="formAllergy" placeholder="過敏藥物" defaultValue={props.allergy} onChange={handleAllergyChange} />
                     </Form.Group>
-                    <Form.Group controlId="formFamilyHistory">
+                    <Form.Group>
                         <Form.Row>
                             <Col>
                                 <Form.Label>地區 :</Form.Label>
-                                <Form.Control type="formCodeDisplay" placeholder="地區" defaultValue={props.city} onChange={handleCityChange} />
+                                <Form.Control id="formCity" placeholder="地區" defaultValue={props.city} onChange={handleCityChange} />
                             </Col>
                             <Col>
                                 <Form.Label>住址 :</Form.Label>
-                                <Form.Control type="formCodeDisplay" placeholder="住址" defaultValue={props.addressText} onChange={handleAddressTextChange} />
+                                <Form.Control id="formAddressText" placeholder="住址" defaultValue={props.addressText} onChange={handleAddressTextChange} />
                             </Col>
                         </Form.Row>
                     </Form.Group>
-                    <Form.Group controlId="formFamilyHistory">
+                    <Form.Group>
                         <Form.Label>電話 :</Form.Label>
-                        <Form.Control type="formCodeDisplay" placeholder="電話" defaultValue={props.telecom} onChange={handleTelecomChange} />
+                        <Form.Control id="formTelecom" placeholder="電話" defaultValue={props.telecom} onChange={handleTelecomChange} />
                     </Form.Group>
                     <Form.Group controlId="formOutcome">
                         <Form.Label>監護人姓名</Form.Label>
                         <Form.Row>
-                            <Col controlId="formNameFamily">
-                                <Form.Control type="formNameFamily" placeholder="姓" defaultValue={props.contactsFamily} onChange={handleContactsNameFamilyChange} />
+                            <Col>
+                                <Form.Control id="formContactFamily" placeholder="姓" defaultValue={props.contactsFamily} onChange={handleContactsNameFamilyChange} />
                             </Col>
                             <Col>
-                                <Form.Control controlId="formNameGiven" type="formCodeDisplay" placeholder="名" defaultValue={props.contactsGiven} onChange={handleContactsNameGivenChange} />
+                                <Form.Control id="formContactGiven" type="formCodeDisplay" placeholder="名" defaultValue={props.contactsGiven} onChange={handleContactsNameGivenChange} />
                             </Col>
                         </Form.Row>
                     </Form.Group>
-                    <Form.Group controlId="formOutcome">
+                    <Form.Group>
                         <Form.Label>監護人關係</Form.Label>
-                        <Form.Control type="formCodeDisplay" placeholder="監護人關係" defaultValue={props.contactsRelation} onChange={handleContactsRelationChange} />
+                        <Form.Control id="formContactRelation" placeholder="監護人關係" defaultValue={props.contactsRelation} onChange={handleContactsRelationChange} />
                     </Form.Group>
                     <Form.Group controlId="formOutcome">
                         <Form.Label>監護人手機</Form.Label>
-                        <Form.Control type="formCodeDisplay" placeholder="監護人手機" defaultValue={props.contactsTel} onChange={handleContactsTelChange} />
+                        <Form.Control id="formContactTelecom" placeholder="監護人手機" defaultValue={props.contactsTel} onChange={handleContactsTelChange} />
                     </Form.Group>
                     <Form.Group controlId="formOutcome">
                         <Form.Label>備註</Form.Label>
-                        <Form.Control type="formCodeOutcome" as="textarea" placeholder="Enter outcome" onChange={handleNoteChange} />
+                        <Form.Control id="formNote" as="textarea" placeholder="Enter outcome" onChange={handleNoteChange} />
                     </Form.Group>
                 </Form>
             </Modal.Body>

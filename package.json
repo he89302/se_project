@@ -7,7 +7,9 @@
         "@devexpress/dx-react-grid": "^2.3.1",
         "@devexpress/dx-react-grid-bootstrap4": "^2.3.1",
         "bootstrap": "^4.3.1",
+        "chai": "^4.2.0",
         "moment": "^2.24.0",
+        "node-fetch": "^2.6.0",
         "react": "^16.12.0",
         "react-bootstrap": "^1.0.0-beta.15",
         "react-datepicker": "^2.10.1",
@@ -18,8 +20,9 @@
     "scripts": {
         "start": "react-scripts start",
         "build": "react-scripts build",
-        "test": "react-scripts test",
-        "eject": "react-scripts eject"
+        "test": "react-scripts test --coverage",
+        "eject": "react-scripts eject",
+        "test:single": "node ./node_modules/jest-single-file-coverage"
     },
     "eslintConfig": {
         "extends": "react-app"
@@ -36,28 +39,10 @@
             "last 1 safari version"
         ]
     },
-    "jest": {
-        "collectCoverageFrom": [
-            "src/**/*.js",
-            "!**/__mocks__/**",
-            "!**/__tests__/**"
-        ],
-        "setupFiles": [
-            "<rootDir>/config/jest/setup.js"
-        ],
-        "setupTestFrameworkScriptFile": "<rootDir>/config/jest/setupTestFramework.js",
-        "testPathIgnorePatterns": [
-            "<rootDir>[/\\\\](build|docs|node_modules)[/\\\\]"
-        ],
-        "testURL": "http://localhost",
-        "transform": {
-            "^.+\\.(js|jsx)$": "<rootDir>/config/jest/transform.js",
-            "^.+\\.(scss|css)$": "<rootDir>/config/jest/cssTransform.js",
-            "^(?!.*\\.(js|jsx|css|scss|json)$)": "<rootDir>/config/jest/fileTransform.js"
-        },
-        "transformIgnorePatterns": [
-            "[/\\\\]node_modules[/\\\\].+\\.(js|jsx)$"
-        ],
-        "testRegex": "/__tests__/.*\\.(test|spec)\\.js$"
+    "devDependencies": {
+        "enzyme": "^3.10.0",
+        "enzyme-adapter-react-16": "^1.15.1",
+        "jest": "^24.9.0",
+        "jest-single-file-coverage": "^1.0.2"
     }
 }

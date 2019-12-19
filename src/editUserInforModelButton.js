@@ -7,15 +7,14 @@ export default function EditUserInforModelButton(props) {
 
     return (
         <ButtonToolbar>
-            <Button variant="primary" onClick={() => setModalShow(true)}>
+            <Button data-testid="toggle" variant="primary" onClick={() => setModalShow(true)}>
                 Edit
-        </Button>
+            </Button>
             <MakePatientModal
                 show={modalShow}
                 onHide={() => setModalShow(false)}
                 setModalShow={setModalShow}
                 {...props}
-                currentTime={props.currentTime}
                 updateName={props.updateName}
                 updateObservationInfo={props.updateObservationInfo}
                 updateAllergyInfo={props.updateAllergyInfo}

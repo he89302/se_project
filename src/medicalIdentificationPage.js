@@ -42,7 +42,7 @@ class MedicalIdentificationPage extends Component {
         }
     }
 
-    patientInfo() {
+    patientInfo = () => {
             CallPatientAPI(this.state.patientId).then(data => {
             this.setState({
                 imageUrl: data.photo[0].url,
@@ -83,6 +83,7 @@ class MedicalIdentificationPage extends Component {
             id:data.id,
             nameFamily: data.name[0].family,
             nameGiven: data.name[0].given,
+            patientId: data.identifier[0].value,
             birthDate: data.birthDate,
             gender: data.gender,
             telecom: data.telecom[0].value,
@@ -203,13 +204,14 @@ class MedicalIdentificationPage extends Component {
                                     </Dropdown.Item>
                                     <Dropdown.Item eventKey="2" href="/ezKanban/logout">
                                         Logout
-                      </Dropdown.Item>
+                                    </Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
                         </Form>
                     </Navbar><br /><br /><br /><br />
                         <div className="button-position" style={{ display: 'flex' }}>
-                            <EditUserInforModelButton {...this.state} 
+                            <EditUserInforModelButton className="editModelButton"
+                                                      {...this.state}
                                                       updateName={this.updateName}
                                                       calculatedAge={this.calculatedAge}
                                                       updateObservationInfo={this.updateObservationInfo}

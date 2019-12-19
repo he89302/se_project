@@ -3,7 +3,7 @@ function CallConditionAPI(id) {
     return (fetch('http://hapi.fhir.org/baseR4/Condition?patient=' + id, { method: 'GET' })
         .then(response => response.json())
         .then((data) => data.entry)
-        .catch(console.log()));
+        .catch(console.log(id, " get faild.")));
 }
 
 export default CallConditionAPI;

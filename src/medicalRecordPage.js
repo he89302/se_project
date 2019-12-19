@@ -1,32 +1,11 @@
-import React, { Component, useState } from 'react';
-import { Navbar, Nav, Form, Dropdown, Button, ButtonToolbar, Container } from 'react-bootstrap'
+import React, { Component } from 'react';
+import { Navbar, Nav, Form, Dropdown, Container } from 'react-bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import MakeProcedureModal from './makeProcedureModal';
+import CrateNewProceedureModelButton from './crateNewProceedureModelButton';
 import CallPatientAPI from './FHIRAPI/callPatientAPI';
 import CallAllergyIntoleranceAPI from './FHIRAPI/callAllergyIntoleranceAPI';
 import CallProcedureAPI from './FHIRAPI/callProcedureAPI';
-
 import Patient from './patient'
-
-function CrateNewProceedureModelButton(props) {
-    const [modalShow, setModalShow] = useState(false);
-
-    return (
-        <ButtonToolbar>
-            <Button variant="primary" onClick={() => setModalShow(true)}>
-                Create new procedure
-        </Button>
-            <MakeProcedureModal
-                show={modalShow}
-                onHide={() => setModalShow(false)}
-                setModalShow={setModalShow}
-                data={props.procedureData}
-                currentTime={props.currentTime}
-                id={props.id}
-            />
-        </ButtonToolbar>
-    );
-}
 
 class MedicalRecordPage extends Component {
 
